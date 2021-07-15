@@ -1,0 +1,65 @@
+from tkinter import *
+from tkinter import messagebox
+from string import ascii_lowercase
+import random
+
+window = Tk()
+window.title('Colgar hombre')
+
+word_list = ["bailar", "comer", "mirar", "vivir"]
+
+photos = [PhotoImage(file="hang0.png"), PhotoImage(file="hang1.png"), PhotoImage(file="hang2.png"),
+          PhotoImage(file="hang3.png"),
+          PhotoImage(file="hang4.png"), PhotoImage(file="hang5.png"), PhotoImage(file="hang6.png"),
+          PhotoImage(file="hang7.png"),
+          PhotoImage(file="hang8.png"), PhotoImage(file="hang9.png"), PhotoImage(file="hang10.png"),
+          PhotoImage(file="hang11.png")]
+
+
+def newGame():
+    global the_word_withspaces
+    global number_of_guesses
+    number_of_guesses = 0
+    imgLabel.config(image=photos[0])
+    the_word = random.choice(word_list)
+    the_word_withspaces = " ".join(the_word)
+    lblWord.set(" ".join("_" * len(the_word)))
+
+
+def guess(letter):
+    global number_of_guesses
+    if number_of_guesses < 11:
+        txt = list(the_word_withspaces)
+        guessed = list(lblWord.get())
+        if the_word_withspaces.count(letter) > 0:
+            for c in range(len(txt)):
+                if txt[c] == letter:
+                    guessed[c] = letter
+                lblWord.set("".join(guessed))
+                if lblWord.get() == the_word_withspaces:
+                    messagebox.showinfo("Hangman", "Ganas")
+    else:
+        number_of_guesses += 1
+        imgLabel.config(image=photos[number_of_guesses])
+        if number_of_guesses == 11:
+            messagebox.showwarning("Hangman", "Pierdes")
+
+
+imgLabel = Label(window)
+imgLabel.grid(row=5, column=2, columnspan=3, padx=10, pady=30)
+imgLabel.config(image=photos[0])
+
+lblWord = StringVar()
+Label(window, textvariable=lblWord, font=("Helvetica 24")).grid(row=0, column=0, columnspan=3, padx=10, pady=40)
+
+n = 0
+for c in ascii_lowercase:
+    Button(window, text=c, command=lambda c=c: guess(c), font=("Helvetica 18"), width=4).grid(row=1 + n // 9,
+                                                                                              column=n % 9)
+    n += 1
+
+Button(window, text="New\nGame", command=lambda: newGame(), font=("Helvetica 10")).grid(row=3, column=8, sticky="NSWE")
+
+newGame()
+
+window.mainloop()
